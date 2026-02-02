@@ -1,0 +1,49 @@
+// Test configuration for OpenClaw with no-auth proxy
+// This demonstrates using a proxy that doesn't require API keys
+{
+  // No environment variables needed - proxy doesn't require auth
+  
+  models: {
+    mode: "merge",
+    providers: {
+      "test-no-auth-proxy": {
+        baseUrl: "http://127.0.0.1:8080/v1",
+        api: "anthropic-messages",
+        // No apiKey field - this proxy doesn't require authentication
+        models: [
+          {
+            id: "claude-opus-4",
+            name: "Claude Opus 4 (Test No-Auth Proxy)",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+        ],
+      },
+    },
+  },
+
+  agents: {
+    defaults: {
+      workspace: "/tmp/openclaw-test-workspace",
+      model: {
+        primary: "test-no-auth-proxy/claude-opus-4",
+      },
+    },
+  },
+
+  // Minimal channel config for testing
+  channels: {
+    whatsapp: {
+      enabled: false,
+    },
+  },
+
+  identity: {
+    name: "TestBot",
+    theme: "test assistant for no-auth proxy",
+    emoji: "🧪",
+  },
+}

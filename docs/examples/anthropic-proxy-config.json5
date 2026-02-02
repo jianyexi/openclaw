@@ -1,0 +1,159 @@
+// Example OpenClaw configuration using Anthropic proxy
+// Save this to ~/.openclaw/openclaw.json
+// 
+// This example demonstrates FOUR ways to configure a proxy:
+// 1. Custom provider with Anthropic-compatible endpoint (with API key)
+// 2. OpenAI-compatible proxy (like Claude Max API Proxy)
+// 3. Override the native Anthropic provider
+// 4. Proxy without API key (no authentication required)
+//
+// Choose ONE approach that fits your proxy setup.
+
+{
+  // Set environment variables for proxy authentication
+  env: {
+    PROXY_API_KEY: "your-proxy-api-key-here",
+  },
+
+  // Option 1: Custom Anthropic-compatible provider
+  // Use this if your proxy implements the Anthropic Messages API
+  models: {
+    mode: "merge",
+    providers: {
+      "anthropic-proxy": {
+        baseUrl: "http://localhost:8080/v1",
+        apiKey: "${PROXY_API_KEY}",
+        api: "anthropic-messages",
+        // Optional: add custom headers
+        headers: {
+          "X-Proxy-Region": "us-west",
+          "X-Custom-Header": "value",
+        },
+        models: [
+          {
+            id: "claude-opus-4",
+            name: "Claude Opus 4 (via proxy)",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 15, output: 75, cacheRead: 1.5, cacheWrite: 7.5 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+          {
+            id: "claude-sonnet-4",
+            name: "Claude Sonnet 4 (via proxy)",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 1.5 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+          {
+            id: "claude-haiku-4",
+            name: "Claude Haiku 4 (via proxy)",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 0.8, output: 4, cacheRead: 0.08, cacheWrite: 0.4 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+        ],
+      },
+
+      // Option 2: OpenAI-compatible proxy
+      // Use this for proxies that expose OpenAI Chat Completions API
+      "claude-openai-proxy": {
+        baseUrl: "http://localhost:3456/v1",
+        apiKey: "not-needed", // Some proxies don't require keys
+        api: "openai-responses",
+        models: [
+          {
+            id: "claude-opus-4",
+            name: "Claude Opus 4",
+            reasoning: false,
+            input: ["text", "image"],
+            // Set costs to 0 if using a subscription proxy
+            cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+        ],
+      },
+
+      // Option 3: Override native Anthropic provider
+      // This keeps using the "anthropic" provider name but routes through proxy
+      // Uncomment this block to use it (remove Options 1 & 2 above)
+      // anthropic: {
+      //   baseUrl: "http://localhost:8080",
+      //   apiKey: "${PROXY_API_KEY}",
+      //   // No need to specify models - pi-ai catalog models will be used
+      // },
+
+      // Option 4: Proxy without API key (no authentication)
+      // Use this for proxies that don't require authentication
+      // Uncomment this block to use it (remove Options 1, 2 & 3 above)
+      // "no-auth-proxy": {
+      //   baseUrl: "http://internal-proxy.company.local:8080/v1",
+      //   api: "anthropic-messages",
+      //   // No apiKey field - authentication not required
+      //   // Optional: explicitly disable auth headers
+      //   // authHeader: false,
+      //   models: [
+      //     {
+      //       id: "claude-opus-4",
+      //       name: "Claude Opus 4 (no auth)",
+      //       reasoning: false,
+      //       input: ["text", "image"],
+      //       cost: { input: 15, output: 75, cacheRead: 1.5, cacheWrite: 7.5 },
+      //       contextWindow: 200000,
+      //       maxTokens: 16000,
+      //     },
+      //   ],
+      // },
+    },
+  },
+
+  // Agent configuration
+  agents: {
+    defaults: {
+      workspace: "~/.openclaw/workspace",
+      model: {
+        // Choose which provider/model to use as primary
+        primary: "anthropic-proxy/claude-opus-4",
+        // Or for OpenAI-compatible proxy: "claude-openai-proxy/claude-opus-4"
+        // Or for overridden native: "anthropic/claude-opus-4-5"
+        // Or for no-auth proxy: "no-auth-proxy/claude-opus-4"
+
+        // Configure fallbacks
+        fallbacks: [
+          "anthropic-proxy/claude-sonnet-4",
+          "anthropic-proxy/claude-haiku-4",
+        ],
+      },
+
+      // Optional: set model aliases for quick access
+      models: {
+        "anthropic-proxy/claude-opus-4": { alias: "opus" },
+        "anthropic-proxy/claude-sonnet-4": { alias: "sonnet" },
+        "anthropic-proxy/claude-haiku-4": { alias: "haiku" },
+      },
+    },
+  },
+
+  // Channel configuration (example)
+  channels: {
+    whatsapp: {
+      allowFrom: ["+15555550123"], // Replace with your number
+      groups: {
+        "*": { requireMention: true },
+      },
+    },
+  },
+
+  // Optional: customize identity
+  identity: {
+    name: "Clawd",
+    theme: "helpful assistant",
+    emoji: "🦞",
+  },
+}
