@@ -16,6 +16,8 @@ You can configure OpenClaw to access Anthropic Claude models through a proxy ser
 - **Custom routing**: Use intermediary services like LiteLLM, Claude Max API Proxy, or custom gateways
 - **Load balancing**: Distribute requests across multiple API keys or endpoints
 
+> **Quick start**: See the [complete configuration example](https://github.com/openclaw/openclaw/blob/main/docs/examples/anthropic-proxy-config.json5) for ready-to-use proxy configurations.
+
 ## How It Works
 
 ```
