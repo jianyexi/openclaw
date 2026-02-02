@@ -515,6 +515,57 @@ Save to `~/.openclaw/openclaw.json` and you can DM the bot from that number.
 }
 ```
 
+### Anthropic via proxy (LiteLLM, custom gateway, etc.)
+
+Route Anthropic Claude requests through a proxy server instead of using direct API keys:
+
+```json5
+{
+  models: {
+    mode: "merge",
+    providers: {
+      "anthropic-proxy": {
+        baseUrl: "http://localhost:8080/v1",
+        apiKey: "${PROXY_API_KEY}",
+        api: "anthropic-messages",
+        headers: {
+          "X-Proxy-Region": "us-west", // Optional: custom proxy headers
+        },
+        models: [
+          {
+            id: "claude-opus-4",
+            name: "Claude Opus 4 (via proxy)",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 15, output: 75, cacheRead: 1.5, cacheWrite: 7.5 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+          {
+            id: "claude-sonnet-4",
+            name: "Claude Sonnet 4 (via proxy)",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 1.5 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+        ],
+      },
+    },
+  },
+  agent: {
+    workspace: "~/.openclaw/workspace",
+    model: {
+      primary: "anthropic-proxy/claude-opus-4",
+      fallbacks: ["anthropic-proxy/claude-sonnet-4"],
+    },
+  },
+}
+```
+
+See [Anthropic Proxy Setup](/providers/anthropic-proxy) for detailed configuration guide.
+
 ### Work bot (restricted access)
 
 ```json5

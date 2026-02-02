@@ -118,6 +118,19 @@ openclaw onboard --auth-choice setup-token
 }
 ```
 
+## Option C: Proxy Server
+
+**Best for:** routing Claude requests through a corporate proxy, LiteLLM, or custom gateway.
+
+Instead of using Anthropic API keys directly, you can configure OpenClaw to route requests through a proxy server. This is useful for:
+
+- Centralized API key management
+- Cost tracking and usage monitoring
+- Custom routing and load balancing
+- Using intermediary services
+
+See [Anthropic Proxy Setup](/providers/anthropic-proxy) for detailed configuration and examples.
+
 ## Notes
 
 - Generate the setup-token with `claude setup-token` and paste it, or run `openclaw models auth setup-token` on the gateway host.
