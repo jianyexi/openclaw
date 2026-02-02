@@ -1,10 +1,11 @@
 // Example OpenClaw configuration using Anthropic proxy
 // Save this to ~/.openclaw/openclaw.json
 // 
-// This example demonstrates three ways to configure a proxy:
-// 1. Custom provider with Anthropic-compatible endpoint
+// This example demonstrates FOUR ways to configure a proxy:
+// 1. Custom provider with Anthropic-compatible endpoint (with API key)
 // 2. OpenAI-compatible proxy (like Claude Max API Proxy)
 // 3. Override the native Anthropic provider
+// 4. Proxy without API key (no authentication required)
 //
 // Choose ONE approach that fits your proxy setup.
 
@@ -87,6 +88,28 @@
       //   apiKey: "${PROXY_API_KEY}",
       //   // No need to specify models - pi-ai catalog models will be used
       // },
+
+      // Option 4: Proxy without API key (no authentication)
+      // Use this for proxies that don't require authentication
+      // Uncomment this block to use it (remove Options 1, 2 & 3 above)
+      // "no-auth-proxy": {
+      //   baseUrl: "http://internal-proxy.company.local:8080/v1",
+      //   api: "anthropic-messages",
+      //   // No apiKey field - authentication not required
+      //   // Optional: explicitly disable auth headers
+      //   // authHeader: false,
+      //   models: [
+      //     {
+      //       id: "claude-opus-4",
+      //       name: "Claude Opus 4 (no auth)",
+      //       reasoning: false,
+      //       input: ["text", "image"],
+      //       cost: { input: 15, output: 75, cacheRead: 1.5, cacheWrite: 7.5 },
+      //       contextWindow: 200000,
+      //       maxTokens: 16000,
+      //     },
+      //   ],
+      // },
     },
   },
 
@@ -99,6 +122,7 @@
         primary: "anthropic-proxy/claude-opus-4",
         // Or for OpenAI-compatible proxy: "claude-openai-proxy/claude-opus-4"
         // Or for overridden native: "anthropic/claude-opus-4-5"
+        // Or for no-auth proxy: "no-auth-proxy/claude-opus-4"
 
         // Configure fallbacks
         fallbacks: [

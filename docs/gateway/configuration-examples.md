@@ -566,6 +566,40 @@ Route Anthropic Claude requests through a proxy server instead of using direct A
 
 See [Anthropic Proxy Setup](/providers/anthropic-proxy) for detailed configuration guide.
 
+### Anthropic proxy without API key
+
+For proxies that don't require authentication (internal network, localhost, IP-based auth):
+
+```json5
+{
+  models: {
+    mode: "merge",
+    providers: {
+      "internal-proxy": {
+        baseUrl: "http://internal-proxy.company.local:8080/v1",
+        api: "anthropic-messages",
+        // No apiKey needed for this proxy
+        models: [
+          {
+            id: "claude-opus-4",
+            name: "Claude Opus 4",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 15, output: 75, cacheRead: 1.5, cacheWrite: 7.5 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+        ],
+      },
+    },
+  },
+  agent: {
+    workspace: "~/.openclaw/workspace",
+    model: { primary: "internal-proxy/claude-opus-4" },
+  },
+}
+```
+
 ### Work bot (restricted access)
 
 ```json5

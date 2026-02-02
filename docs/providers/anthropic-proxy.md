@@ -29,6 +29,13 @@ The proxy server receives requests in Anthropic's API format and forwards them t
 
 ## Configuration Options
 
+OpenClaw supports four proxy configuration patterns:
+
+1. **Anthropic-compatible proxy with API key** - For authenticated proxies using Anthropic API format
+2. **OpenAI-compatible proxy** - For proxies exposing OpenAI format (like Claude Max API Proxy)
+3. **Override native provider** - Keep using `anthropic` provider name but route through proxy
+4. **No authentication proxy** - For proxies that don't require API keys (new!)
+
 ### Option 1: Anthropic-Compatible Proxy (Recommended)
 
 If your proxy implements the Anthropic Messages API format, use this configuration:
@@ -138,6 +145,66 @@ If you want to keep using the `anthropic` provider name but route through a prox
 ```
 
 **Note**: When overriding the native provider, you don't need to specify models unless you want to customize them. The pi-ai catalog models will be used with your custom baseUrl.
+
+### Option 4: Proxy Without API Key
+
+If your proxy doesn't require authentication (e.g., internal corporate proxy, localhost development), you can omit the `apiKey` field entirely:
+
+```json5
+{
+  models: {
+    mode: "merge",
+    providers: {
+      "no-auth-proxy": {
+        baseUrl: "http://internal-proxy.company.local:8080/v1",
+        api: "anthropic-messages",
+        // No apiKey needed
+        models: [
+          {
+            id: "claude-opus-4",
+            name: "Claude Opus 4 (internal proxy)",
+            reasoning: false,
+            input: ["text", "image"],
+            cost: { input: 15, output: 75, cacheRead: 1.5, cacheWrite: 7.5 },
+            contextWindow: 200000,
+            maxTokens: 16000,
+          },
+        ],
+      },
+    },
+  },
+  agents: {
+    defaults: {
+      model: { primary: "no-auth-proxy/claude-opus-4" },
+    },
+  },
+}
+```
+
+**Alternative: Explicit no authentication**
+
+If you want to be explicit or if your proxy requires the absence of authentication headers, use `authHeader: false`:
+
+```json5
+{
+  models: {
+    providers: {
+      "no-auth-proxy": {
+        baseUrl: "http://localhost:8080/v1",
+        api: "anthropic-messages",
+        authHeader: false, // Don't send any auth headers
+        models: [...]
+      }
+    }
+  }
+}
+```
+
+This is useful when:
+- Your proxy is on localhost or internal network
+- Your proxy uses IP-based authentication
+- Your proxy handles authentication at the network/firewall level
+- You're testing without authentication
 
 ## Environment Variables
 
